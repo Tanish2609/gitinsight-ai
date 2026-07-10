@@ -3,3 +3,4 @@ langchain
 langchain-ollama
 python-dotenv
 gitpython
+langchain-text-splitters
