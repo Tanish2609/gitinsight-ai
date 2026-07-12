@@ -4,3 +4,6 @@ langchain-ollama
 python-dotenv
 gitpython
 langchain-text-splitters
+langchain-google-genai
+streamlit
+langchain-mistralai

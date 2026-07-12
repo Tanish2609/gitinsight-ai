@@ -8,5 +8,8 @@ class GraphState(TypedDict):
     source_files : list[Path]
     current_index : int = 0
     current_file : Path | None
-    reviews : dict
+    reviews : dict[str , str]
+    chunk_reviews: list[str]
+    final_review : str
+    report_path : str
 

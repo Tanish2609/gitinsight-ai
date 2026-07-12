@@ -1,8 +1,10 @@
+from time import perf_counter
+
 from graph.state import GraphState
 from models.llm import llm
 from tools.file_reader import read_file
+from tools.chunker import chunk_text
 from prompts.reviewer import REVIEWER_PROMPT
-
 
 review_chain = REVIEWER_PROMPT | llm
 
@@ -10,31 +12,55 @@ review_chain = REVIEWER_PROMPT | llm
 def reviewer_node(state: GraphState) -> GraphState:
 
     current_file = state["current_file"]
-
     file_content = read_file(current_file)
 
-    relative_path = str(
-        current_file.relative_to(state["repo_path"])
-    )
+    print(f"\nReviewing: {current_file}")
 
-    # Skip empty/error files
-    if (
-        file_content == "Empty File"
-        or file_content.startswith("File Not Found")
-        or file_content.startswith("Permission Denied")
-        or file_content.startswith("Error Reading File")
-    ):
-        state["reviews"][relative_path] = file_content
+    # ---------- Small Files ----------
+    if len(file_content) < 4000:
+
+        start = perf_counter()
+
+        response = review_chain.invoke(
+            {
+                "current_file": str(current_file.relative_to(state["repo_path"])),
+                "file_content": file_content,
+            }
+        )
+
+        print(f"Completed in {perf_counter() - start:.2f}s")
+
+        state["chunk_reviews"] = [response.content]
+
         return state
 
-    prompt_value = {
-        "current_file": relative_path,
-        "file_content": file_content,
-    }
+    # ---------- Large Files ----------
+    chunks = chunk_text(file_content)
+    chunk_reviews = []
 
-    review = review_chain.invoke(prompt_value)
+    file_start = perf_counter()
 
-    state["reviews"][relative_path] = review.content
+    for i, chunk in enumerate(chunks, start=1):
+
+        chunk_start = perf_counter()
+
+        response = review_chain.invoke(
+            {
+                "current_file": str(current_file.relative_to(state["repo_path"])),
+                "file_content": chunk,
+            }
+        )
+
+        chunk_reviews.append(response.content)
+
+        print(
+            f"Chunk {i}/{len(chunks)} completed in "
+            f"{perf_counter() - chunk_start:.2f}s"
+        )
+
+    print(f"Total review time: {perf_counter() - file_start:.2f}s")
+
+    state["chunk_reviews"] = chunk_reviews
 
     return state
 

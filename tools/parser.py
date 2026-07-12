@@ -26,7 +26,6 @@ SUPPORTED_EXTENSIONS = {
     ".php",
     ".html",
     ".css",
-    ".md"
 }
 
 def get_source_files(repo_path : Path) -> list[Path]:
