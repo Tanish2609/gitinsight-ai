@@ -1,3 +1,8 @@
+![Python](https://img.shields.io/badge/Python-3.11-blue)
+![LangGraph](https://img.shields.io/badge/LangGraph-Agentic%20AI-green)
+![LangChain](https://img.shields.io/badge/LangChain-LLM-success)
+![Streamlit](https://img.shields.io/badge/Streamlit-UI-red)
+![License](https://img.shields.io/badge/License-MIT-yellow)
 # 🔍 GitInsight AI
 
 > An AI-powered GitHub repository code review system built with **LangGraph** that automatically clones GitHub repositories, reviews source code using LLMs, generates repository-level insights, and exports professional Markdown reports.
